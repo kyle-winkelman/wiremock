@@ -11,6 +11,7 @@ Standard and custom matched stub                           |
 POST                                                       | POST
 /thing                                                     | /thing
                                                            |
-[custom matcher: my-custom-matcher]                        |                                                     <<<<< Custom matcher does not match
+[custom matcher: my-custom-matcher-expected-actual]        | actual                                              <<<<< Custom matcher does not match
+present                                                    |
                                                            |
 -----------------------------------------------------------------------------------------------------------------------

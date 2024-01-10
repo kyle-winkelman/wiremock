@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2021 Thomas Akehurst
+ * Copyright (C) 2015-2024 Thomas Akehurst
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,19 @@ public abstract class RequestMatcherExtension extends RequestMatcher implements 
   }
 
   public abstract MatchResult match(Request request, Parameters parameters);
+
+  @Override
+  public String getExpected() {
+    return getExpected(Parameters.empty());
+  }
+
+  public String getExpected(Parameters parameters) {
+    return "";
+  }
+
+  public String getActual(Request request) {
+    return " ";
+  }
 
   @Override
   public String getName() {

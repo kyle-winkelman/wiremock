@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2023 Thomas Akehurst
+ * Copyright (C) 2017-2024 Thomas Akehurst
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import com.github.tomakehurst.wiremock.http.FormParameter;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,11 @@ public class PlainTextDiffRendererTest {
   public void init() {
     diffRenderer =
         new PlainTextDiffRenderer(
-            Collections.singletonMap("my-custom-matcher", new MyCustomMatcher()));
+            Map.of(
+                "my-custom-matcher",
+                new MyCustomMatcher(),
+                "my-custom-matcher-expected-actual",
+                new MyCustomMatcherExpectedActual()));
   }
 
   @Test
@@ -490,6 +493,26 @@ public class PlainTextDiffRendererTest {
   }
 
   @Test
+  public void showsErrorInDiffWhenNamedCustomMatcherExpectedActualNotSatisfiedInMixedStub() {
+    Diff diff =
+        new Diff(
+            post("/thing")
+                .withName("Standard and custom matched stub")
+                .andMatching(
+                    "my-custom-matcher-expected-actual", Parameters.one("myVal", "present"))
+                .build(),
+            mockRequest().method(POST).url("/thing"));
+
+    String output = diffRenderer.render(diff);
+    System.out.println(output);
+
+    assertThat(
+        output,
+        equalsMultiLine(
+            file("not-found-diff-sample_mixed-matchers-named-custom-expected-actual.txt")));
+  }
+
+  @Test
   public void showsErrorInDiffWhenExactMatchForMultipleValuesInQueryParamNotSatisfiedInStub() {
     Diff diff =
         new Diff(
@@ -630,6 +653,30 @@ public class PlainTextDiffRendererTest {
     @Override
     public String getName() {
       return "my-custom-matcher";
+    }
+  }
+
+  public static class MyCustomMatcherExpectedActual extends RequestMatcherExtension {
+
+    @Override
+    public MatchResult match(Request request, Parameters parameters) {
+      parameters.getString("myVal"); // Ensure we're getting passed parameters as expcted
+      return MatchResult.noMatch();
+    }
+
+    @Override
+    public String getExpected(Parameters parameters) {
+      return parameters.getString("myVal");
+    }
+
+    @Override
+    public String getActual(Request request) {
+      return "actual";
+    }
+
+    @Override
+    public String getName() {
+      return "my-custom-matcher-expected-actual";
     }
   }
 }

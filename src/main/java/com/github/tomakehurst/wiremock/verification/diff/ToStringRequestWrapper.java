@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2023 Thomas Akehurst
+ * Copyright (C) 2018-2024 Thomas Akehurst
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class EmptyToStringRequestWrapper implements Request {
+public class ToStringRequestWrapper implements Request {
 
   private final Request target;
+  private final String toString;
 
-  public EmptyToStringRequestWrapper(Request target) {
+  public ToStringRequestWrapper(Request target, String toString) {
     this.target = target;
+    this.toString = toString;
   }
 
   @Override
@@ -161,6 +163,6 @@ public class EmptyToStringRequestWrapper implements Request {
 
   @Override
   public String toString() {
-    return " ";
+    return toString;
   }
 }
